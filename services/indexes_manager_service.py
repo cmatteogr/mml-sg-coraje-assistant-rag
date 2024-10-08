@@ -1,14 +1,14 @@
 from repositories.indexes_repository import IndexesRepository
 
 class IndexesManagerService:
-    def __init__(self, indexes_repositorie: IndexesRepository):
-        self.indexes_manager = indexes_repositorie
+    def __init__(self, indexes_repository: IndexesRepository):
+        self.indexes_manager = indexes_repository
 
     def create_index(self, path):
         return self.indexes_manager.create_indexes(path)
     
     def save_index(self, index, name):
-        path = "indexes/" + name
+        path = "data/" + name
         return self.indexes_manager.save_indexes(index, path)
     
     def load_index(self, path):

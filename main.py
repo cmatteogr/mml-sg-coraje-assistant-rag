@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 
-    path_index = 'indexes'
+    path_index = 'data'
     indexes_files = []
 
     for num, file in enumerate(os.listdir(path_index)):
