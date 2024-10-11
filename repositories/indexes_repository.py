@@ -25,8 +25,12 @@ class IndexesRepository:
                 vector = FAISS.from_documents(documents, HuggingFaceEmbeddings())
             case '.txt':
                 with open(path, "r") as file:
-                    documents = file.read()
-                    vector = FAISS.from_texts(documents, HuggingFaceEmbeddings())
+                    text = file.read()
+                    documents = [{'content': text, 'metadata': {'source': path}}]
+                    # Extract content and metadata separately
+                    texts = [doc['content'] for doc in documents]
+                    metadata_text = [doc['metadata'] for doc in documents]
+                    vector = FAISS.from_texts(texts, HuggingFaceEmbeddings(), metadatas=metadata_text)
             case _:
                 raise Exception(f"Invalid input type: {file_extension}")
 
