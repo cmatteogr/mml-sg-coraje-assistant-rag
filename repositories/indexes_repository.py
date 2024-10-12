@@ -1,6 +1,8 @@
 from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OllamaEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 import os
 
@@ -26,10 +28,15 @@ class IndexesRepository:
             case '.txt':
                 with open(path, "r") as file:
                     text = file.read()
-                    documents = [{'content': text, 'metadata': {'source': path}}]
+
+                    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+                    texts = splitter.split_text(text)
+                    metadata_text = [{'source': path} for doc in texts]
+
+                    # documents = [{'content': text, 'metadata': {'source': path}}]
                     # Extract content and metadata separately
-                    texts = [doc['content'] for doc in documents]
-                    metadata_text = [doc['metadata'] for doc in documents]
+                    # texts = [doc['content'] for doc in documents]
+                    # metadata_text = [doc['metadata'] for doc in documents]
                     vector = FAISS.from_texts(texts, HuggingFaceEmbeddings(), metadatas=metadata_text)
             case _:
                 raise Exception(f"Invalid input type: {file_extension}")
