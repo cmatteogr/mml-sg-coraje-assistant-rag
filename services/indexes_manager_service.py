@@ -7,8 +7,7 @@ class IndexesManagerService:
     def create_index(self, path):
         return self.indexes_manager.create_indexes(path)
     
-    def save_index(self, index, name):
-        path = "data/" + name
+    def save_index(self, index, path):
         return self.indexes_manager.save_indexes(index, path)
     
     def load_index(self, path):

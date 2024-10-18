@@ -1,0 +1,132 @@
+[
+  {
+    "original_title": "1. Introducción al Grupo de Estudio Machine Learning Medellin (2024-02-21 19_06 GMT-5)",
+    "new_title": "Introduction to Machine Learning Study Group - Medellin",
+    "summary": "This document introduces the Machine Learning Study Group based in Medellín. It outlines the purpose of the group, emphasizing its collaborative, open learning format. Participants are encouraged to share ideas, datasets, and projects. The session includes an overview of why Machine Learning is important, types of Machine Learning, and a practical demo of building a model."
+  },
+  {
+    "original_title": "2. Exploración de Modelos de ML y Exploración de Datos (2024-02-28 19_14 GMT-5)",
+    "new_title": "Exploration of Machine Learning Models and Data Analysis",
+    "summary": "This document covers the exploration of Machine Learning models and their applications. It discusses the use of supervised learning to classify materials in an industrial setting and the use of Machine Learning in medical fields, like cancer detection. The session emphasizes how these models can automate processes like recycling and improve tasks like identifying medical anomalies from radiographs."
+  },
+  {
+    "original_title": "3. Análisis de Datos y Selección de Variables para Modelado (2024-03-06 19_08 GMT-5)",
+    "new_title": "Data Analysis and Feature Selection for Modeling",
+    "summary": "This session focuses on data analysis and feature selection for building Machine Learning models. It explains how regression models can predict real estate prices, highlighting supervised learning techniques. The document also discusses regression types (linear, polynomial) and the importance of understanding algorithmic strengths and weaknesses."
+  },
+  {
+    "original_title": "4. Construcción del Modelo de Predicción - Supervised Learning (2024-03-13 19_07 GMT-5)",
+    "new_title": "Building Prediction Models - Supervised Learning",
+    "summary": "This document details the construction of predictive models using supervised learning. It builds on the previous session, discussing advanced concepts like overfitting, underfitting, and bias-variance trade-offs. The session explores Support Vector Machines (SVMs) and decision trees, with practical examples of real estate price prediction models."
+  },
+  {
+    "original_title": "5. Supervised Learning - Optimización del Modelo (2024-04-10 19_11 GMT-5)",
+    "new_title": "Supervised Learning - Model Optimization",
+    "summary": "This session explores the optimization of supervised learning models, with a focus on reducing error in predicting real estate prices. Techniques like CatBoost, a sequentially trained version of Random Forest, are discussed for improving model performance. The session covers how to prevent overfitting and the use of AutoML for automating model selection and parameter tuning."
+  },
+  {
+    "original_title": "6. Implementación de la Detección de Anomalías (2024-04-17 19_09 GMT-5)",
+    "new_title": "Anomaly Detection Implementation",
+    "summary": "This session focuses on implementing anomaly detection using real-world data from the U.S. car market. The group discusses scraping car data, including price, mileage, and condition, from a large dataset. The aim is to identify underpriced vehicles that could represent good investment opportunities."
+  },
+  {
+    "original_title": "7. Evaluación del Modelo y Resultados de la Detección de Anomalías (2024-04-24 19_09 GMT-5)",
+    "new_title": "Model Evaluation and Anomaly Detection Results",
+    "summary": "This session evaluates the results of an anomaly detection model applied to a dataset of car prices. The session covers data preprocessing techniques and the application of data profiling for initial insights. It also explores how to handle missing and duplicated data while predicting anomalies in car prices."
+  },
+  {
+    "original_title": "8. Preparación para el Despliegue del Modelo (2024-05-02 19_09 GMT-5)",
+    "new_title": "Model Deployment Preparation",
+    "summary": "This session prepares for deploying the machine learning model that predicts car prices. It discusses data preparation steps, including handling duplicates, missing values, and applying business-relevant transformations. Techniques like price binning and power transformations are discussed to improve model performance."
+  },
+  {
+    "original_title": "9. Despliegue del Modelo y Monitoreo en Producción (2024-05-08 19_12 GMT-5)",
+    "new_title": "Model Deployment and Monitoring in Production",
+    "summary": "This session covers the deployment of the car price prediction model into production. It discusses the preparation for data deployment, handling duplications, and improving categorical transformations. The session also touches on monitoring the model's performance in production, highlighting the importance of continuously updating the dataset and adjusting the model as new data becomes available."
+  },
+  {
+    "original_title": "10. Revisión Final y Lecciones Aprendidas del Proyecto de Predicción de Precios de Carros (2024-05-15 19_11 GMT-5)",
+    "new_title": "Final Review and Lessons Learned from the Car Price Prediction Project",
+    "summary": "This document provides a final review of the car price prediction project, summarizing key findings and improvements made throughout the process. It discusses challenges such as handling outliers, data preprocessing steps, and feature transformations. The session emphasizes the importance of balancing data categories and making the model robust by managing high-dimensional data efficiently."
+  },
+  {
+    "original_title": "11. Introducción al Uso de Autoencoders en Detección de Anomalías (2024-05-22 19_34 GMT-5)",
+    "new_title": "Introduction to Autoencoders for Anomaly Detection",
+    "summary": "This session introduces autoencoders as a tool for detecting anomalies in datasets. The focus is on separating the target (price) from the dataset to avoid bias in data imputation. The process of imputing missing values is explained using algorithms like Iterative Imputation and Random Forests."
+  },
+  {
+    "original_title": "12. Implementación de Autoencoders para Detección de Anomalías en Datos de Carros (2024-05-29 19_11 GMT-5)",
+    "new_title": "Autoencoder Implementation for Car Data Anomaly Detection",
+    "summary": "This session describes the implementation of autoencoders to detect anomalies in a dataset of car prices. The document covers preprocessing steps, such as categorical data transformation, and explains how autoencoders are trained to detect unusual car prices. The session includes a discussion on dimensionality reduction and handling high-cardinality features using hashing techniques."
+  },
+  {
+    "original_title": "13. Evaluación del Desempeño de Autoencoders en la Detección de Anomalías (2024-06-05 19_10 GMT-5)",
+    "new_title": "Evaluating Autoencoder Performance for Anomaly Detection",
+    "summary": "This document evaluates the performance of autoencoders in anomaly detection. It focuses on the results of several models (Random Forest, CatBoost, AutoML) and compares their performance using metrics like R-squared and RMSE. Autoencoders performed exceptionally well, achieving an R-squared score of 98.97%."
+  },
+  {
+    "original_title": "14. Optimización de Autoencoders para Mejorar la Detección de Anomalías (2024-06-12 19_10 GMT-5)",
+    "new_title": "Optimizing Autoencoders for Enhanced Anomaly Detection",
+    "summary": "This session explores the optimization of autoencoders to improve anomaly detection in the dataset. The discussion covers hyperparameter tuning and model adjustments, such as applying regularization techniques to prevent overfitting. The session emphasizes the need to scale data properly when using autoencoders."
+  },
+  {
+    "original_title": "15. Integración de Autoencoders en el Pipeline de Predicción de Precios de Carros (2024-06-18 19_12 GMT-5)",
+    "new_title": "Integration of Autoencoders in Car Price Prediction Pipeline",
+    "summary": "This session describes how autoencoders were integrated into the car price prediction pipeline. It outlines the end-to-end process, from scraping car data (color, mileage, manufacturer) to preprocessing and transforming categorical variables. The integration of autoencoders allows for anomaly detection to improve data quality before feeding into the regression model."
+  },
+  {
+    "original_title": "16. Despliegue de Autoencoders para la Detección de Anomalías en Producción (2024-07-03 19_07 GMT-5)",
+    "new_title": "Autoencoder Deployment for Anomaly Detection in Production",
+    "summary": "This session covers the deployment of autoencoders for anomaly detection in a production environment. It provides a step-by-step guide on deploying the model and discusses the practical considerations of handling real-world data from the car market."
+  },
+  {
+    "original_title": "17. Monitoreo y Mantenimiento del Sistema de Detección de Anomalías (2024-07-24 19_29 GMT-5)",
+    "new_title": "Monitoring and Maintenance of the Anomaly Detection System",
+    "summary": "This session focuses on the monitoring and maintenance of the anomaly detection system used in the car price prediction project. It covers the preprocessing steps, such as cleaning raw data and applying transformations like scaling and vectorization. The session also discusses the challenges of maintaining high computational efficiency and outlines methods for ensuring consistent model performance."
+  },
+  {
+    "original_title": "18. Revisión Final y Lecciones Aprendidas sobre Autoencoders para Detección de Anomalías (2024-08-07 19_09 GMT-5)",
+    "new_title": "Final Review and Lessons Learned on Autoencoders for Anomaly Detection",
+    "summary": "This document provides a comprehensive final review of the Autoencoder-based anomaly detection project. It reflects on the progress, detailing how autoencoders were used to detect anomalies, especially underpriced cars. The session emphasizes the potential applications of this model beyond price detection, such as medical and image-based anomaly detection."
+  },
+  {
+    "original_title": "19. Bases de RAGs para construir un asistente virtual (2024-08-14 19_09 GMT-5)",
+    "new_title": "Foundations of RAGs for Building a Virtual Assistant",
+    "summary": "This document introduces Retrieval-Augmented Generation (RAG) as a method for building virtual assistants. It explains how large language models (LLMs) work in conjunction with vector databases to enhance context retrieval and response generation. The discussion covers key architectural components like tokenization, vectorization, and similarity measures."
+  },
+  {
+    "original_title": "20. Introducción a Grafos Machine Learning (GNN) (2024-08-21 19_09 GMT-5)",
+    "new_title": "Introduction to Graph Neural Networks (GNN) in Machine Learning",
+    "summary": "This document provides an introductory overview of Graph Neural Networks (GNNs) and their application in machine learning. It covers the basic structure of graphs, including nodes and edges, and explains how GNNs leverage these relationships to model complex systems. Real-world examples such as security systems, social networks, and molecule interactions are provided to illustrate GNN applications."
+  },
+  {
+    "original_title": "21. Principios base de Grafos en Machine Learning (2024-08-28 19_09 GMT-5)",
+    "new_title": "Fundamental Principles of Graphs in Machine Learning",
+    "summary": "This session covers the foundational concepts of graphs in machine learning, focusing on their application in systems involving interconnections such as servers or entities in a network. Key terms like node degree, walks, paths, and subgraphs are introduced, emphasizing how graph structures provide insights into relationships beyond simple feature-target connections."
+  },
+  {
+    "original_title": "22. Deep Learning en Grafos Introduccion (2024-09-04 19_09 GMT-5)",
+    "new_title": "Introduction to Deep Learning in Graphs",
+    "summary": "This session introduces deep learning techniques in the context of graph structures, focusing on the development of a game-like attack-defense model. The discussion includes the use of graph neural networks (GNNs) for modeling complex networks, such as servers communicating through various protocols. Comparisons are made to popular games to illustrate the dynamics of attack and defense between nodes."
+  },
+  {
+    "original_title": "23. Graph Embeddings Introduccion y Attack-Defend Game (2024-09-11 19_10 GMT-5)",
+    "new_title": "Introduction to Graph Embeddings and the Attack-Defend Game",
+    "summary": "This session focuses on graph embeddings and their application in the attack-defense game. It models server communications, including benign and malicious actions, using graph structures. The goal is to simulate a strategic game where nodes either attack or defend, with graph embeddings helping to analyze the relationships between servers."
+  },
+  {
+    "original_title": "24. Understanding Graph Embedding and Profiling Cyberattacks (2024_09_18 18_59 COT)",
+    "new_title": "Understanding Graph Embedding and Cyberattack Profiling",
+    "summary": "This document explores the use of graph embeddings for profiling cyberattacks on a network of interconnected servers. It provides a detailed look at traffic data, analyzing various types of attacks such as botnets and DDoS attacks. Graph embeddings help model complex relationships between nodes, enabling the detection and prediction of attack patterns within the network."
+  },
+  {
+    "original_title": "25. Graph Embeddings Introduction (2024-10-02 19_09 GMT-5)",
+    "new_title": "Introduction to Graph Embeddings",
+    "summary": "This session introduces the concept of graph embeddings, explaining how node relationships in a graph can be converted into vector space representations. The discussion includes two key methods for graph embeddings: DeepWalk and Node2Vec. These methods transform graphs into lower-dimensional vector spaces, allowing for the capture of relationships between nodes based on proximity and frequency of connections."
+  },
+  {
+    "original_title": "26. Community Detection Introduction (2024-10-09 19_09 GMT-5)",
+    "new_title": "Introduction to Community Detection in Graphs",
+    "summary": "This session focuses on community detection within graphs, a process for identifying clusters or groups of nodes that are more densely connected to each other than to the rest of the network. The session explains various community detection algorithms, such as k-means clustering and modularity-based methods like Louvain, and introduces the concept of clustering inertia."
+  }
+]

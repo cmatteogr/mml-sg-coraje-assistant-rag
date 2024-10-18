@@ -1,64 +1,65 @@
 import os
+
+from fontTools.varLib.featureVars import overlayBox
+
 from services.indexes_manager_service import IndexesManagerService
 from repositories.indexes_repository import IndexesRepository
+import json
+import shutil
 
-def run_create_index(path, name):
+def run_create_index(path, index_path):
     """
     :param path: The directory path for which the index is to be created.
-    :param name: The name to save the created index under.
+    :param index_path: final Index path
     :return: None
     """
     service = IndexesManagerService(IndexesRepository())
 
     if path != "data":
         index = service.create_index(path)
-        service.save_index(index, name)
+        service.save_index(index, index_path)
     else:
         print(f"\033[92m Servicio no disponible aún ___________"
               f"\U0001F995 \U0001F995 \U0001F995 \U0001F995 \033[0m___________")
 
 
-DATA_DIRECTORY = 'data'
-
-
-def get_meeting_txt_files(meetings_folder_path):
-    meetings_files = os.listdir(meetings_folder_path)
-    txt_files = [f"{num}. {file}" for num, file in enumerate(meetings_files) if file.endswith(".txt")]
-    return txt_files
-
-def get_meeting_csv_files(meetings_folder_path):
-    meetings_files = os.listdir(meetings_folder_path)
-    csv_files = [f"{num}. {file}" for num, file in enumerate(meetings_files) if file.endswith(".csv")]
-    return csv_files
-
-
-def user_input_for_indexing(txt_files):
-    list_files = "\n".join(txt_files)
-    file_choice = input(f"Choose which PDF to vectorize, enter the number corresponding to each PDF \n"
-                        f"-1. All\n{list_files}\n \033[91m___________________________ \n")
-    index_name = input("\033[0mEnter the name of the index: \n \033[91m___________________________ \n")
-    return file_choice, index_name
-
+INPUT_DIRECTORY = 'data/input'
+INDEX_DIRECTORY = 'data/index'
 
 if __name__ == "__main__":
     # Coraje Assistant - MLL-SG
+
+    # NOTE: Change input_type to 'txt' if you want to index the transcriptions of the meetings
     input_type = 'csv'
 
-    meetings_transcriptions_folder_path = os.path.join(DATA_DIRECTORY, f'meetings_transcriptions_{input_type}')
+    # read json file
+    index_data_file_path = os.path.join(INPUT_DIRECTORY,'index_dict.json')
+    # Open the file and load its contents as a list of dictionaries
+    with open(index_data_file_path, 'r') as file:
+        index_data = json.load(file)
 
-    match input_type:
-        case 'csv':
-            meetings_files = get_meeting_csv_files(meetings_transcriptions_folder_path)
-        case 'txt':
-            meetings_files = get_meeting_txt_files(meetings_transcriptions_folder_path)
-        case _:
-            raise Exception("Invalid input type")
+    # init index orchestrator dict
+    index_orchestrator = {}
+    # for each meeting in the index data file, run the create_index function. create a new folder per meeting
+    for meeting_data in index_data:
+        print(f"create index for {meeting_data['original_title']}")
+        index_n = meeting_data['original_title'].split('.')[0].strip()
+        new_filename = f"{index_n}. {meeting_data['new_title']}"
+        o_index_data_file_path = os.path.join(INPUT_DIRECTORY, f"meetings_transcriptions_{input_type}", f"{meeting_data['original_title']}.{input_type}")
 
-    file_choice, index_name = user_input_for_indexing(meetings_files)
+        # create meeting folder, overwrite if exists
+        meeting_data_folder_path = os.path.join(INDEX_DIRECTORY, new_filename)
+        if os.path.exists(meeting_data_folder_path):
+            shutil.rmtree(meeting_data_folder_path)
+        os.makedirs(meeting_data_folder_path)
 
-    if file_choice == "-1":
-        for meeting_file in os.listdir(meetings_transcriptions_folder_path):
-            run_create_index(os.path.join(meetings_transcriptions_folder_path, meeting_file), index_name)
-    else:
-        chosen_file = meetings_files[int(file_choice) - 1].split(". ")[1]
-        run_create_index(os.path.join(meetings_transcriptions_folder_path, chosen_file), index_name)
+        # run create index
+        run_create_index(o_index_data_file_path, meeting_data_folder_path)
+
+        # add index to orchestrator data object
+        index_orchestrator[new_filename] = meeting_data['summary']
+
+    # save index orchestrator dict as JSON file
+    index_orchestrator_file_path = os.path.join(INDEX_DIRECTORY, 'index_orchestrator.json')
+    with open(index_orchestrator_file_path, 'w') as file:
+        json.dump(index_orchestrator, file)
