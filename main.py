@@ -48,6 +48,8 @@ def create_qa_retriever(path):
 
 
 def load_intro_llm():
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
     # Use the intro LLM to orchestrate the retrieval
     llm_name_intro = os.getenv(LLM_NAME_INTRO_KEY)
     intro_llm = Ollama(model=llm_name_intro)
@@ -55,9 +57,22 @@ def load_intro_llm():
     return intro_llm
 
 
+def get_substring_between(s, start_char, end_char):
+    # Find the first occurrence of the start character
+    start_index = s.find(start_char)
+    # Find the first occurrence of the end character after the start character
+    end_index = s.find(end_char, start_index + 1)
+
+    # Check if both start and end characters exist in the string
+    if start_index != -1 and end_index != -1:
+        # Return the substring between the start and end character
+        return s[start_index + 1:end_index]
+    else:
+        return None  # Return None if the start or end character is not found
+
 def respond(question, history):
     prompt_template_intro = os.getenv(PROMPT_TEMPLATE_INTRO_KEY)
-    question_intro = prompt_template_intro.format(question=question, indexes_data=json.dumps(indexes_data))
+    question_intro = prompt_template_intro.format(question=question, indexes_data=json.dumps(indexes_dict_data))
     question_intro = question_intro.replace("{", "{{").replace("}", "}}")
 
     # Generate a response
@@ -65,32 +80,64 @@ def respond(question, history):
 
     # clean response and read json from string
     response = response.replace("{{", "{").replace("}}", "}")
+    print('response relevant indexes', response)
     indexes_data = json.loads(response)
     indexes_data_list = indexes_data['indexes']
 
-    path_index = 'data'
-    index_files = get_index_files(path_index)
-    chosen_file = choose_index_file(index_files)
-    qa_instance = create_qa_retriever(os.path.join(path_index, chosen_file))
+    # if none index context was found then return
+    if len(indexes_data_list) == 0:
+        return "No data was found related to your question, try another question"
 
+    print(f"Indexes with the response: {indexes_data_list}")
 
     # NOTE: full_context may need a limit to avoid Long context window
     contexts_len = 1000
     history_text = "\n".join(map(lambda q_r: ", ".join(q_r), history))
-    full_context = history_text + "\n" + question
-    full_context = full_context[-contexts_len:]
+    full_context_question = history_text + "\n" + question
+    full_context_question = full_context_question[-contexts_len:]
 
-    return qa_instance(full_context)["result"]
+    # for each index, create a retriever and run the qa_instance
+    responses = []
+    for index_data_name_response in indexes_data_list:
+        # define the qa instance to use
+        qa_instance_response = qa_instances_data[index_data_name_response]
+
+        # use the history and generate the response
+        responses.append(qa_instance_response(full_context_question)["result"])
+
+    # summarize the responses
+    final_response = intro_llm(f"In a JSON combine all the responses for this question: {question} in a JSON like this {{\"summary\": \"responses_summary\"}}. Only return the JSON with the summary. Summarize the responses:{json.dumps(responses)}. Helpful responses summary:")
+    print('final_response', final_response)
+    # clean response and read json from string
+    final_response = get_substring_between(final_response, '{', '}')
+    try:
+        final_response = "{"+final_response+"}"
+        final_response_data = json.loads(final_response.strip())
+        final_response = final_response_data['summary']
+    except:
+        pass
+    return str(final_response)
 
 
 if __name__ == "__main__":
     load_dotenv()
 
-    # load context indexes file, json file
-    with open('data/index/index_orchestrator.json', 'r') as file:
-        indexes_data = json.load(file)
+    path_index = 'data/index'
 
+    # load context indexes file, json file
+    with open(os.path.join(path_index, 'index_orchestrator.json'), 'r') as file:
+        indexes_dict_data = json.load(file)
+
+    # init the intro LLM
     intro_llm = load_intro_llm()
+
+    # Load all the qa instances save them as a dict
+    qa_instances_data = {}
+    for index_data_name in indexes_dict_data:
+        # load the qa instance
+        qa_instance = create_qa_retriever(os.path.join(path_index, index_data_name))
+        # save the qa instance
+        qa_instances_data[index_data_name] = qa_instance
 
     gr.ChatInterface(
         respond,
@@ -98,5 +145,4 @@ if __name__ == "__main__":
         textbox=gr.Textbox(placeholder=f"Ask me about Medellin Machine Learning - Study Group", container=False, scale=7),
         title=f"Coraje Chatbot",
         cache_examples=True,
-        retry_btn=None,
     ).launch(share=True)
