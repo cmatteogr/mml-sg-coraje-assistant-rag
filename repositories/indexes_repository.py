@@ -4,6 +4,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.embeddings import OllamaEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
+import pandas as pd
 import os
 
 import warnings
@@ -32,12 +33,12 @@ class IndexesRepository:
                     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
                     texts = splitter.split_text(text)
                     metadata_text = [{'source': path} for doc in texts]
-
-                    # documents = [{'content': text, 'metadata': {'source': path}}]
-                    # Extract content and metadata separately
-                    # texts = [doc['content'] for doc in documents]
-                    # metadata_text = [doc['metadata'] for doc in documents]
                     vector = FAISS.from_texts(texts, HuggingFaceEmbeddings(), metadatas=metadata_text)
+            case '.csv':
+                df = pd.read_csv(path)
+                texts = df['Transcript'].tolist()
+                metadata_text = [{'source': path} for doc in texts]
+                vector = FAISS.from_texts(texts, HuggingFaceEmbeddings(), metadatas=metadata_text)
             case _:
                 raise Exception(f"Invalid input type: {file_extension}")
 

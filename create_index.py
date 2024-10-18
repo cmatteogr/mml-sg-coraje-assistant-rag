@@ -26,6 +26,11 @@ def get_meeting_txt_files(meetings_folder_path):
     txt_files = [f"{num}. {file}" for num, file in enumerate(meetings_files) if file.endswith(".txt")]
     return txt_files
 
+def get_meeting_csv_files(meetings_folder_path):
+    meetings_files = os.listdir(meetings_folder_path)
+    csv_files = [f"{num}. {file}" for num, file in enumerate(meetings_files) if file.endswith(".csv")]
+    return csv_files
+
 
 def user_input_for_indexing(txt_files):
     list_files = "\n".join(txt_files)
@@ -36,14 +41,24 @@ def user_input_for_indexing(txt_files):
 
 
 if __name__ == "__main__":
-    meetings_transcriptions_folder_path = os.path.join(DATA_DIRECTORY, 'meetings_transcriptions')
-    meetings_txt_files = get_meeting_txt_files(meetings_transcriptions_folder_path)
+    # Coraje Assistant - MLL-SG
+    input_type = 'csv'
 
-    file_choice, index_name = user_input_for_indexing(meetings_txt_files)
+    meetings_transcriptions_folder_path = os.path.join(DATA_DIRECTORY, f'meetings_transcriptions_{input_type}')
+
+    match input_type:
+        case 'csv':
+            meetings_files = get_meeting_csv_files(meetings_transcriptions_folder_path)
+        case 'txt':
+            meetings_files = get_meeting_txt_files(meetings_transcriptions_folder_path)
+        case _:
+            raise Exception("Invalid input type")
+
+    file_choice, index_name = user_input_for_indexing(meetings_files)
 
     if file_choice == "-1":
         for meeting_file in os.listdir(meetings_transcriptions_folder_path):
             run_create_index(os.path.join(meetings_transcriptions_folder_path, meeting_file), index_name)
     else:
-        chosen_file = meetings_txt_files[int(file_choice) - 1].split(". ")[1]
+        chosen_file = meetings_files[int(file_choice) - 1].split(". ")[1]
         run_create_index(os.path.join(meetings_transcriptions_folder_path, chosen_file), index_name)
