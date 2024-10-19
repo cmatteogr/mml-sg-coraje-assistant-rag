@@ -1,5 +1,9 @@
+from datetime import datetime
+
 import gradio as gr
 import os
+
+from models.gradio_models import QAGradio
 from services.indexes_manager_service import IndexesManagerService
 from services.langchain_manager_service import LangchainManagerService
 from repositories.indexes_repository import IndexesRepository
@@ -7,6 +11,7 @@ from repositories.langchain_repository import LangchainRepository
 from dotenv import load_dotenv
 import json
 from langchain.llms import Ollama
+from unit_of_work.uow import SQLServerUnitOfWork
 
 PROMPT_TEMPLATE_BASE_KEY = 'PROMPT_TEMPLATE_BASE'
 PROMPT_TEMPLATE_INTRO_KEY = 'PROMPT_TEMPLATE_INTRO'
@@ -14,7 +19,8 @@ LLM_NAME_BASE_KEY = 'LLM_NAME_BASE'
 LLM_NAME_INTRO_KEY = 'LLM_NAME_INTRO'
 VECTOR_QUANTITY_KEY = 'VECTOR_QUANTITY'
 
-#PROMPT_TEMPLATE = "1. Use the following pieces of context to answer the question at the end.\n2. If you don't know the answer, just say that \"No sé la respuesta\" but don't make up an answer on your own.\n3. Keep the answer crisp and limited to 3,4 sentences.\nContext: {context}\nQuestion: {question}\nHelpful Answer:"
+
+# PROMPT_TEMPLATE = "1. Use the following pieces of context to answer the question at the end.\n2. If you don't know the answer, just say that \"No sé la respuesta\" but don't make up an answer on your own.\n3. Keep the answer crisp and limited to 3,4 sentences.\nContext: {context}\nQuestion: {question}\nHelpful Answer:"
 
 
 def get_index_files(path_index):
@@ -70,6 +76,7 @@ def get_substring_between(s, start_char, end_char):
     else:
         return None  # Return None if the start or end character is not found
 
+
 def respond(question, history):
     prompt_template_intro = os.getenv(PROMPT_TEMPLATE_INTRO_KEY)
     question_intro = prompt_template_intro.format(question=question, indexes_data=json.dumps(indexes_dict_data))
@@ -106,16 +113,26 @@ def respond(question, history):
         responses.append(qa_instance_response(full_context_question)["result"])
 
     # summarize the responses
-    final_response = intro_llm(f"In a JSON combine all the responses for this question: {question} in a JSON like this {{\"summary\": \"responses_summary\"}}. Only return the JSON with the summary. Summarize the responses:{json.dumps(responses)}. Helpful responses summary:")
+    final_response = intro_llm(
+        f"In a JSON combine all the responses for this question: {question} in a JSON like this {{\"summary\": \"responses_summary\"}}. Only return the JSON with the summary. Summarize the responses:{json.dumps(responses)}. Helpful responses summary:")
     print('final_response', final_response)
     # clean response and read json from string
     final_response = get_substring_between(final_response, '{', '}')
     try:
-        final_response = "{"+final_response+"}"
+        final_response = "{" + final_response + "}"
         final_response_data = json.loads(final_response.strip())
         final_response = final_response_data['summary']
     except:
         pass
+
+    final_response = str(final_response)
+
+    # save response in DB
+    with uow:
+        qa_user_gradio = QAGradio(question=str(question), answer=str(final_response), history=str(history),
+                                  exe_datetime=datetime.now())
+        uow.repo.insert_qa_users_gradio(qa_user_gradio)
+
     return str(final_response)
 
 
@@ -131,6 +148,8 @@ if __name__ == "__main__":
     # init the intro LLM
     intro_llm = load_intro_llm()
 
+    uow = SQLServerUnitOfWork()
+
     # Load all the qa instances save them as a dict
     qa_instances_data = {}
     for index_data_name in indexes_dict_data:
@@ -142,7 +161,8 @@ if __name__ == "__main__":
     gr.ChatInterface(
         respond,
         chatbot=gr.Chatbot(height=500),
-        textbox=gr.Textbox(placeholder=f"Ask me about Medellin Machine Learning - Study Group", container=False, scale=7),
-        title=f"Coraje Chatbot",
+        textbox=gr.Textbox(placeholder=f"Ask me about Medellin Machine Learning - Study Group", container=False,
+                           scale=7),
+        title=f"Coraje MML-SG. Chatbot",
         cache_examples=True,
     ).launch(share=True)
