@@ -20,9 +20,6 @@ LLM_NAME_INTRO_KEY = 'LLM_NAME_INTRO'
 VECTOR_QUANTITY_KEY = 'VECTOR_QUANTITY'
 
 
-# PROMPT_TEMPLATE = "1. Use the following pieces of context to answer the question at the end.\n2. If you don't know the answer, just say that \"No sé la respuesta\" but don't make up an answer on your own.\n3. Keep the answer crisp and limited to 3,4 sentences.\nContext: {context}\nQuestion: {question}\nHelpful Answer:"
-
-
 def get_index_files(path_index):
     return [f"{num}. {file}" for num, file in enumerate(os.listdir(path_index))]
 
@@ -78,63 +75,66 @@ def get_substring_between(s, start_char, end_char):
 
 
 def respond(question, history):
-    prompt_template_intro = os.getenv(PROMPT_TEMPLATE_INTRO_KEY)
-    question_intro = prompt_template_intro.format(question=question, indexes_data=json.dumps(indexes_dict_data))
-    question_intro = question_intro.replace("{", "{{").replace("}", "}}")
+    for i in range(3):
+        try:
+            prompt_template_intro = os.getenv(PROMPT_TEMPLATE_INTRO_KEY)
+            question_intro = prompt_template_intro.format(question=question, indexes_data=json.dumps(indexes_dict_data))
+            question_intro = question_intro.replace("{", "{{").replace("}", "}}")
 
-    # Generate a response
-    response = intro_llm(question_intro)
+            # Generate a response
+            response = intro_llm(question_intro)
 
-    # clean response and read json from string
-    response = response.replace("{{", "{").replace("}}", "}")
-    print('response relevant indexes', response)
-    indexes_data = json.loads(response)
-    indexes_data_list = indexes_data['indexes']
+            # clean response and read json from string
+            response = response.replace("{{", "{").replace("}}", "}")
+            print('response relevant indexes', response)
+            indexes_data = json.loads(response)
+            indexes_data_list = indexes_data['indexes']
 
-    # if none index context was found then return
-    if len(indexes_data_list) == 0:
-        return "No data was found related to your question, try another question"
+            # if none index context was found then return
+            if len(indexes_data_list) == 0:
+                return "No data was found related to your question, try another question"
 
-    print(f"Indexes with the response: {indexes_data_list}")
+            print(f"Indexes with the response: {indexes_data_list}")
 
-    # NOTE: full_context may need a limit to avoid Long context window
-    contexts_len = 1000
-    history_text = "\n".join(map(lambda q_r: ", ".join(q_r), history))
-    full_context_question = history_text + "\n" + question
-    full_context_question = full_context_question[-contexts_len:]
+            # NOTE: full_context may need a limit to avoid Long context window
+            contexts_len = 1000
+            history_text = "\n".join(map(lambda q_r: ", ".join(q_r), history))
+            full_context_question = history_text + "\n" + question
+            full_context_question = full_context_question[-contexts_len:]
 
-    # for each index, create a retriever and run the qa_instance
-    responses = []
-    for index_data_name_response in indexes_data_list:
-        # define the qa instance to use
-        qa_instance_response = qa_instances_data[index_data_name_response]
+            # for each index, create a retriever and run the qa_instance
+            responses = []
+            for index_data_name_response in indexes_data_list:
+                # define the qa instance to use
+                qa_instance_response = qa_instances_data[index_data_name_response]
 
-        # use the history and generate the response
-        responses.append(qa_instance_response(full_context_question)["result"])
+                # use the history and generate the response
+                responses.append(qa_instance_response(full_context_question)["result"])
 
-    # summarize the responses
-    final_response = intro_llm(
-        f"In a JSON combine all the responses for this question: {question} in a JSON like this {{\"summary\": \"responses_summary\"}}. Only return the JSON with the summary. Summarize the responses:{json.dumps(responses)}. Helpful responses summary:")
-    print('final_response', final_response)
-    # clean response and read json from string
-    final_response = get_substring_between(final_response, '{', '}')
-    try:
-        final_response = "{" + final_response + "}"
-        final_response_data = json.loads(final_response.strip())
-        final_response = final_response_data['summary']
-    except:
-        pass
+            # summarize the responses
+            final_response = intro_llm(
+                f"Summarize the following responses:{json.dumps(responses)} in one single response given this question: {question}. Return a JSON like this {{\"summary\": \"single_summary_response\"}}. Helpful JSON responses summary:")
+            print('final_response', final_response)
+            # clean response and read json from string
+            final_response = get_substring_between(final_response, '{', '}')
+            try:
+                final_response = "{" + final_response + "}"
+                final_response_data = json.loads(final_response.strip())
+                final_response = final_response_data['summary']
+            except Exception as e:
+                print('error extracting summary', e)
 
-    final_response = str(final_response)
+            final_response = str(final_response)
 
-    # save response in DB
-    with uow:
-        qa_user_gradio = QAGradio(question=str(question), answer=str(final_response), history=str(history),
-                                  exe_datetime=datetime.now())
-        uow.repo.insert_qa_users_gradio(qa_user_gradio)
+            # save response in DB
+            with uow:
+                qa_user_gradio = QAGradio(question=str(question), answer=str(final_response), history=str(history),
+                                          exe_datetime=datetime.now())
+                uow.repo.insert_qa_users_gradio(qa_user_gradio)
 
-    return str(final_response)
-
+            return str(final_response)
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     load_dotenv()
