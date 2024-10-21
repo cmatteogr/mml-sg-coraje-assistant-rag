@@ -36,6 +36,13 @@ class IndexesRepository:
             case '.csv':
                 df = pd.read_csv(path)
                 texts = df['Transcript'].tolist()
+
+                # Clean the data
+                texts = list(map(lambda x: x.replace(" um ", ""), texts))
+                texts = list(map(lambda x: x.replace(" ah ", ""), texts))
+                texts = list(map(lambda x: x.replace("eh?", ""), texts))
+                texts = list(map(lambda x: x.replace(" eh ", ""), texts))
+
                 metadata_text = [{'source': path} for doc in texts]
                 vector = FAISS.from_texts(texts, HuggingFaceEmbeddings(), metadatas=metadata_text)
             case _:
